@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-mongoose.connect("mongodb://127.0.0.1:27017/pintrest")
+mongoose.connect('mongodb://127.0.0.1:27017/pintrestDataBase')
 
 const userSchema = new mongoose.Schema({
   username: {
@@ -12,10 +12,13 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  posts: [],
+  posts: [{
+    type : mongoose.Schema.Types.ObjectId,
+    ref: 'Post'
+  }],
   displayPicture: {
     type: String,
-   
+    default: null // Use null as default value
   },
   email: {
     type: String,
@@ -26,6 +29,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true
   }
+  
 });
 
 module.exports = mongoose.model('User', userSchema);
