@@ -14,21 +14,33 @@ router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
-router.post("/register", function(req,res){
-  const userData = new userModel({
-  username: req.body.username,
-  email: req.body.email,
-  fullname: req.body.fullname
- 
-  }) ;
+router.get('/login', function(req, res, next) {
+  res.render('login',);
+});
 
-  userModel.register(userData,req.body.password)
-  .then(function(){
-    passport.authenticate("local")(res,res,function(){
-      res.redirect("/profile")
-    })
-  })
-  // 1. userModel.register(userData, req.body.password): Assuming userModel is a Mongoose model for managing user data, 
+router.get("/feed" , function(req,res,next){
+  res.render('feed')
+})
+
+router.post("/login" ,passport.authenticate("local" , {
+  successRedirect : "/profile" ,
+  failureRedirect: "/" ,
+
+}), function(req,res){
+ // agar humne login kara toh hamara banda login ho jayeg a
+}) ; 
+
+
+  router.post("/register" , function(req,res){
+    const { username , email , fullname } = req.body ;
+    const userData = new userModel({username , email , fullname}) ;
+
+    userModel.register(userData , req.body.password)
+    .then(function(){
+      passport.authenticate("local")(req,res,function(){
+        res.redirect("/profile") ;
+      })
+      // 1. userModel.register(userData, req.body.password): Assuming userModel is a Mongoose model for managing user data, 
 // this line is registering a new user in the database.
 // It's calling a method called register on the userModel, passing in userData as the user data (likely obtained from the request body) and req.body.password as the user's password.
 // The register method is typically provided by plugins like passport-local-mongoose, which adds authentication-related methods to the user model.
@@ -39,20 +51,14 @@ router.post("/register", function(req,res){
 // 3. passport.authenticate("local")(req, res, function() { ... }): This line is authenticating the user after successful registration. It's using Passport.js's local authentication strategy, which typically verifies a user's credentials against the database.
 //  If authentication succeeds, it will invoke the function provided as the third argument.
 //   In this case, it's redirecting the user to the "/profile" route.
-})
+    })
+  })
 
 router.get("/profile" , isLogedIn , function(req,res,next){
   res.send("profile") ;
   // yeh page tab tak nhi khulega jab tak mai loged in nhi ho jata 
 })
 
-router.post("/login" ,passport.authenticate("local" , {
-  successRedirect : "/profile" ,
-  failureRedirect: "/" ,
-
-}), function(req,res){
- // agar humne login kara toh hamara banda login ho jayeg a
-}) ; 
 
 router.get("/logout" , function(req,res){
   req.logout(function(err){
@@ -66,7 +72,7 @@ router.get("/logout" , function(req,res){
 
 function isLogedIn(req,res,next){
   if(req.isAuthenticated()) return next() ; 
-  res.redirect("/") ;
+  res.redirect("/login") ;
 }
 
 
